@@ -66,6 +66,22 @@ app.post('/api/employees', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const startServer = (port) => {
+  const server = app.listen(port, '0.0.0.0', () => {
+    console.log(`Server listening on port ${port}`);
+  });
+
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      const nextPort = port + 1;
+      console.warn(`Port ${port} is busy, trying ${nextPort}...`);
+      startServer(nextPort);
+      return;
+    }
+
+    console.error(error);
+    process.exit(1);
+  });
+};
+
+startServer(Number(PORT));
