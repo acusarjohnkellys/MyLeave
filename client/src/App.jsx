@@ -1,4 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+
+const initialEmployees = [
+  { id: 1, name: 'Alicia Chen', email: 'alicia@company.com', role: 'Product Manager', department: 'Product', status: 'Active' },
+  { id: 2, name: 'Marcus Lee', email: 'marcus@company.com', role: 'Software Engineer', department: 'Engineering', status: 'Active' }
+];
 
 const emptyEmployee = {
   name: '',
@@ -9,39 +14,20 @@ const emptyEmployee = {
 };
 
 function App() {
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(initialEmployees);
   const [form, setForm] = useState(emptyEmployee);
   const [message, setMessage] = useState('');
 
-  const loadEmployees = async () => {
-    try {
-      const response = await fetch('/api/employees');
-      const data = await response.json();
-      setEmployees(data);
-    } catch (error) {
-      setEmployees([]);
-    }
-  };
-
-  useEffect(() => {
-    loadEmployees();
-  }, []);
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const response = await fetch('/api/employees', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-      const data = await response.json();
-      setMessage(data.message || 'Employee saved.');
-      setForm(emptyEmployee);
-      loadEmployees();
-    } catch (error) {
-      setMessage('Unable to save right now.');
+    if (!form.name || !form.email || !form.role || !form.department) {
+      setMessage('Please fill in all required fields.');
+      return;
     }
+
+    setEmployees([{ id: Date.now(), ...form }, ...employees]);
+    setMessage('Employee added to the demo dashboard.');
+    setForm(emptyEmployee);
   };
 
   return (
