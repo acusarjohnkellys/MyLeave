@@ -2,6 +2,7 @@
   "name": "myleave",
   "private": true,
   "scripts": {
+    "start": "node server/server.js",
     "build": "npm --prefix client install && npm --prefix client run build && rm -rf dist && mkdir -p dist && cp -R client/dist/. dist/"
   }
 }
