@@ -1,9 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const initialEmployees = [
-  { id: 1, name: 'Alicia Chen', email: 'alicia@company.com', role: 'Product Manager', department: 'Product', status: 'Active' },
-  { id: 2, name: 'Marcus Lee', email: 'marcus@company.com', role: 'Software Engineer', department: 'Engineering', status: 'Active' }
-];
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001';
 
 const emptyEmployee = {
   name: '',
@@ -14,9 +11,24 @@ const emptyEmployee = {
 };
 
 function App() {
-  const [employees, setEmployees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState([]);
   const [form, setForm] = useState(emptyEmployee);
   const [message, setMessage] = useState('');
+
+  const loadEmployees = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/employees`);
+      const data = await response.json();
+      setEmployees(data);
+    } catch (error) {
+      setEmployees([]);
+      setMessage('Unable to load employees right now.');
+    }
+  };
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -25,9 +37,19 @@ function App() {
       return;
     }
 
-    setEmployees([{ id: Date.now(), ...form }, ...employees]);
-    setMessage('Employee added to the demo dashboard.');
-    setForm(emptyEmployee);
+    try {
+      const response = await fetch(`${API_URL}/api/employees`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      const data = await response.json();
+      setMessage(data.message || 'Employee saved.');
+      setForm(emptyEmployee);
+      loadEmployees();
+    } catch (error) {
+      setMessage('Unable to save employee right now.');
+    }
   };
 
   return (
