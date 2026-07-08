@@ -2,6 +2,6 @@
   "name": "myleave",
   "private": true,
   "scripts": {
-    "build": "npm --prefix client install && npm --prefix client run build"
+    "build": "npm --prefix client install && npm --prefix client run build && rm -rf dist && mkdir -p dist && cp -R client/dist/. dist/"
   }
 }
