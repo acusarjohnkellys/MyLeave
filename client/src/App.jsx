@@ -14,9 +14,13 @@ function App() {
   const [message, setMessage] = useState('');
 
   const loadEmployees = async () => {
-    const response = await fetch('/api/employees');
-    const data = await response.json();
-    setEmployees(data);
+    try {
+      const response = await fetch('/api/employees');
+      const data = await response.json();
+      setEmployees(data);
+    } catch (error) {
+      setEmployees([]);
+    }
   };
 
   useEffect(() => {
@@ -25,15 +29,19 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch('/api/employees', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    });
-    const data = await response.json();
-    setMessage(data.message);
-    setForm(emptyEmployee);
-    loadEmployees();
+    try {
+      const response = await fetch('/api/employees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      const data = await response.json();
+      setMessage(data.message || 'Employee saved.');
+      setForm(emptyEmployee);
+      loadEmployees();
+    } catch (error) {
+      setMessage('Unable to save right now.');
+    }
   };
 
   return (
